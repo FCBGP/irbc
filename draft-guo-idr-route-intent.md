@@ -9,16 +9,16 @@ number:
 date:
 consensus: true
 v: 3
-# area: AREA
-workgroup: IDR
+area: "Routing"
+workgroup: "Inter-Domain Routing"
 keyword:
 venue:
-  group: WG
-  type: Working Group
-  mail: WG@example.com
-  arch: https://example.com/WG
-  github: USER/REPO
-  latest: https://example.com/LATEST
+  group: "Inter-Domain Routing"
+  type: "Working Group"
+  mail: "idr@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/idr/"
+  github: "FCBGP/idr-intent"
+  latest: "https://FCBGP.github.io/idr-intent/draft-guo-idr-route-intent.html"
 
 pi:    # can use array (if all yes) or hash here
 toc: yes
