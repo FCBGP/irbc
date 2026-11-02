@@ -42,10 +42,10 @@ and might be willing to help you through the process. Email them and ask.
 
 ## Working Group Information
 
-Discussion of this work occurs on the [Inter-Domain Routing
-Working Group mailing list](mailto:idr@ietf.org)
-([archive](https://mailarchive.ietf.org/arch/browse/idr/),
-[subscribe](https://www.ietf.org/mailman/listinfo/idr)).
+Discussion of this work occurs on the [Network Management
+Research Group mailing list](mailto:nmrg@irtf.org)
+([archive](https://mailarchive.ietf.org/arch/browse/nmrg),
+[subscribe](https://mailman.irtf.org/mailman/listinfo/nmrg)).
 In addition to contributions in GitHub, you are encouraged to participate in
 discussions there.
 
@@ -53,4 +53,4 @@ discussions there.
 technical issues needs to occur on the mailing list.
 
 You might also like to familiarize yourself with other
-[Working Group documents](https://datatracker.ietf.org/wg/idr/documents/).
+[Research Group documents](https://datatracker.ietf.org/rg/nmrg/documents/).
