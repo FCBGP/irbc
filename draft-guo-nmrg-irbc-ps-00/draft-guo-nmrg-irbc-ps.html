@@ -1,0 +1,1887 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Inter-Domain Routing Behavior Commitments: Problem Statement and Requirements</title>
+<meta content="Yangfei Guo" name="author">
+<meta content="Ke Xu" name="author">
+<meta content="Xiaoliang Wang" name="author">
+<meta content="
+       This document examines whether a routing-specific commitment model is useful for expressing and assessing an AS's own expected BGP behavior across administrative-domain boundaries. An Inter-Domain Routing Behavior Commitment (IRBC) is a candidate declaration. It is attributable to an issuer and applies to specific inter-domain connections, route scopes, directions, and operating conditions. Its semantics include the subject AS's connection role, the associated routing behavior, and a commitment context that defines scope, conditions, exceptions, and validity. 
+       The document distinguishes an IRBC from a general IBN intent, an interconnection service request, local routing policy, route-path authorization, and cryptographic evidence of an individual route-propagation event. 
+    " name="description">
+<meta content="xml2rfc 3.34.1" name="generator">
+<meta content="draft-guo-nmrg-irbc-ps-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.34.1
+    Python 3.14.8
+    ConfigArgParse 1.8.0
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.13.4
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.9.2
+-->
+<link href="draft-guo-nmrg-irbc-ps.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
+}
+svg {
+  display: block;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
+}
+.alignCenter {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+      float: none;
+    }
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a {
+  text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
+}
+.iref + a[href].internal {
+  color: var(--text-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
+  }
+  @media print {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+  & .prepared {
+    float: right;
+  }
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
+  }
+}
+
+/* Comments */
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
+      }
+    }
+    & a.toplink {
+      float: right;
+    }
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
+    }
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc {
+    page-break-before: always;
+    border-top: none;
+    padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">IRBC Problem Statement</td>
+<td class="right">November 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Guo, et al.</td>
+<td class="center">Expires 6 May 2027</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Network Management Research Group</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-guo-nmrg-irbc-ps-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-11-02" class="published">2 November 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2027-05-06">6 May 2027</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">Y. Guo</div>
+<div class="org">Zhongguancun Laboratory</div>
+</div>
+<div class="author">
+      <div class="author-name">K. Xu</div>
+<div class="org">Tsinghua University</div>
+</div>
+<div class="author">
+      <div class="author-name">X. Wang</div>
+<div class="org">Tsinghua University</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Inter-Domain Routing Behavior Commitments: Problem Statement and Requirements</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document examines whether a routing-specific commitment model is useful for expressing and assessing an AS's own expected BGP behavior across administrative-domain boundaries. An Inter-Domain Routing Behavior Commitment (IRBC) is a candidate declaration. It is attributable to an issuer and applies to specific inter-domain connections, route scopes, directions, and operating conditions. Its semantics include the subject AS's connection role, the associated routing behavior, and a commitment context that defines scope, conditions, exceptions, and validity.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">The document distinguishes an IRBC from a general IBN intent, an interconnection service request, local routing policy, route-path authorization, and cryptographic evidence of an individual route-propagation event.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 6 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-inter-domain-routing-behavi" class="internal xref">Inter-Domain Routing Behavior Commitment</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1" class="keepWithNext"><a href="#section-2.2" class="auto internal xref">2.2</a>.  <a href="#name-issuer-and-subject" class="internal xref">Issuer and Subject</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
+                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="auto internal xref">2.3</a>.  <a href="#name-connection-role" class="internal xref">Connection Role</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.4">
+                <p id="section-toc.1-1.2.2.4.1"><a href="#section-2.4" class="auto internal xref">2.4</a>.  <a href="#name-declared-behavior" class="internal xref">Declared Behavior</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5">
+                <p id="section-toc.1-1.2.2.5.1"><a href="#section-2.5" class="auto internal xref">2.5</a>.  <a href="#name-commitment-context" class="internal xref">Commitment Context</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.6">
+                <p id="section-toc.1-1.2.2.6.1"><a href="#section-2.6" class="auto internal xref">2.6</a>.  <a href="#name-observed-behavior" class="internal xref">Observed Behavior</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.7">
+                <p id="section-toc.1-1.2.2.7.1"><a href="#section-2.7" class="auto internal xref">2.7</a>.  <a href="#name-evidence" class="internal xref">Evidence</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.8">
+                <p id="section-toc.1-1.2.2.8.1"><a href="#section-2.8" class="auto internal xref">2.8</a>.  <a href="#name-external-assessment" class="internal xref">External Assessment</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-inter-domain-routing-scenar" class="internal xref">Inter-Domain Routing Scenarios</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-route-class-specific-export" class="internal xref">Route-Class-Specific Export Commitment</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-conditional-backup-advertis" class="internal xref">Conditional Backup Advertisement</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-scope-dependent-interconnec" class="internal xref">Scope-Dependent Interconnection Behavior</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-control-plane-and-data-plan" class="internal xref">Control-Plane and Data-Plane Boundary</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-problem-statement" class="internal xref">Problem Statement</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-from-local-policy-to-an-att" class="internal xref">From Local Policy to an Attributable External Declaration</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-issuer-subject-and-authorit" class="internal xref">Issuer, Subject, and Authority</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-scope-and-behavioral-semant" class="internal xref">Scope and Behavioral Semantics</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-evidence-and-external-obser" class="internal xref">Evidence and External Observability</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5">
+                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-unilateral-and-bilateral-st" class="internal xref">Unilateral and Bilateral Statements</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.6">
+                <p id="section-toc.1-1.4.2.6.1"><a href="#section-4.6" class="auto internal xref">4.6</a>.  <a href="#name-assessment-and-uncertainty" class="internal xref">Assessment and Uncertainty</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.7">
+                <p id="section-toc.1-1.4.2.7.1"><a href="#section-4.7" class="auto internal xref">4.7</a>.  <a href="#name-lifecycle-and-information-d" class="internal xref">Lifecycle and Information Disclosure</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-positioning-and-gap" class="internal xref">Positioning and Gap</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-requirements" class="internal xref">Requirements</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-issuer-and-subject-attribut" class="internal xref">Issuer and Subject Attribution</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-self-commitment-and-party-s" class="internal xref">Self-Commitment and Party Separation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-routing-specific-scope" class="internal xref">Routing-Specific Scope</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
+                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-behavior-semantics" class="internal xref">Behavior Semantics</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5">
+                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-claim-to-evidence-relations" class="internal xref">Claim-to-Evidence Relationship</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.6">
+                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-external-assessment-2" class="internal xref">External Assessment</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.7">
+                <p id="section-toc.1-1.6.2.7.1"><a href="#section-6.7" class="auto internal xref">6.7</a>.  <a href="#name-lifecycle-and-consistency" class="internal xref">Lifecycle and Consistency</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.8">
+                <p id="section-toc.1-1.6.2.8.1"><a href="#section-6.8" class="auto internal xref">6.8</a>.  <a href="#name-disclosure-and-deployment" class="internal xref">Disclosure and Deployment</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-scope-and-non-goals" class="internal xref">Scope and Non-Goals</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-relationship-to-existing-an" class="internal xref">Relationship to Existing and Mechanisms</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#appendix-B.1" class="auto internal xref">B.1</a>.  <a href="#name-ibn" class="internal xref">IBN</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                <p id="section-toc.1-1.11.2.2.1"><a href="#appendix-B.2" class="auto internal xref">B.2</a>.  <a href="#name-bgp-policy-and-policy-repre" class="internal xref">BGP Policy and Policy Representation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3">
+                <p id="section-toc.1-1.11.2.3.1"><a href="#appendix-B.3" class="auto internal xref">B.3</a>.  <a href="#name-routing-security-mechanisms" class="internal xref">Routing-Security Mechanisms</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">The Border Gateway Protocol (BGP) defined in <span>[<a href="#RFC4271" class="cite xref">RFC4271</a>]</span> enables independently administered Autonomous Systems (ASes) to exchange reachability information. Each AS determines its routing behavior through local policies, operational procedures, topology, and configuration. An AS may have expectations about how it will originate, accept, select, advertise, or propagate routes for a particular inter-domain connection. An AS operator may make statements about its routing behavior.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">These expectations and behaviors can be typically configured using existing routing-policy mechanisms. The issue addressed here is not the absence of mechanisms to configure or signal routing behavior. It is whether a commonly understood, issuer-attributable commitment model adds value by bringing together the identity and authority of the issuer, the AS behavior being declared, the applicable scope and conditions, and the evidence available to an external assessor.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">Intent-Based Networking (IBN) provides general concepts for expressing network goals at an appropriate level of abstraction and translating those goals into network actions. IBN also considers monitoring and assurance to assess whether observed network behavior remains consistent with an intent refering to <span>[<a href="#RFC9315" class="cite xref">RFC9315</a>]</span>. Intent classification and scope are further discussed in <span>[<a href="#RFC9316" class="cite xref">RFC9316</a>]</span>. These concepts provide the general foundation for this document. <span>[<a href="#I-D.irtf-nmrg-ibn-usecases" class="cite xref">I-D.irtf-nmrg-ibn-usecases</a>]</span> has considered IBN for routing and path selection, IBN for interconnection, and multi-domain intent resolution. <span>[<a href="#I-D.contreras-nmrg-interconnection-intents" class="cite xref">I-D.contreras-nmrg-interconnection-intents</a>]</span> has considered conventional IP peering and more advanced interconnection services.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">However, this document examines a more specific question: How can an AS make an attributable declaration about its own expected BGP routing behavior, scoped to defined inter-domain connections and route classes, so that another independently administered domain can understand the declaration and assess it against suitable routing evidence?<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">A general network intent and a routing behavior commitment may serve different purposes. An intent typically expresses operational goals and desired outcomes for a network or service. A routing behavior commitment is a more explicit statement attributable to a particular AS or an entity authorized to act on its behalf, describing behavior for which that AS takes operational responsibility.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">This distinction matters in inter-domain environments. The AS that makes a declaration, the AS that consumes it, and the entity that observes routing behavior may be in different administrative domains. A remote observer may not have access to the issuer's internal policy configuration, complete routing information bases, or all Adj-RIB-Out state. Consequently, a declaration needs to identify the behavior being claimed and its scope, while an assessment needs to state what the available evidence can and cannot establish.<a href="#section-1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="conventions-and-definitions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<div id="inter-domain-routing-behavior-commitment">
+<section id="section-2.1">
+        <h3 id="name-inter-domain-routing-behavi">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-inter-domain-routing-behavi" class="section-name selfRef">Inter-Domain Routing Behavior Commitment</a>
+        </h3>
+<p id="section-2.1-1">An Inter-Domain Routing Behavior Commitment (IRBC) is a candidate, issuer-attributable declaration in which an AS or an entity authorized to act on its behalf states the routing behavior that the subject AS undertakes to provide or enforce for specified inter-domain connections, route scopes, directions, and operating conditions. An IRBC may identify: (1) the subject's connection role in the specified inter-domain relationship; (2) the associated routing behavior; and (3) the commitment context that defines applicable scope, direction, conditions, exceptions, validity, and responsibility.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+<p id="section-2.1-2">The term commitment denotes an attributable operational statement of responsibility. It does not by itself establish that the behavior has been followed, create a legal obligation, or establish a bilateral agreement. The need for a distinct IRBC model, rather than an extension or specialization of an existing interconnection-intent representation, is a question for further.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="issuer-and-subject">
+<section id="section-2.2">
+        <h3 id="name-issuer-and-subject">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-issuer-and-subject" class="section-name selfRef">Issuer and Subject</a>
+        </h3>
+<p id="section-2.2-1">The issuer is the entity that creates and publishes or otherwise provides an IRBC. The subject is the AS or routing domain whose behavior is described. The issuer may be the subject itself or an entity authorized to act on its behalf. A future model needs to distinguish authority over an AS number, authority over address resources, and operational authority over routing policy where those authorities differ.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="connection-role">
+<section id="section-2.3">
+        <h3 id="name-connection-role">
+<a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-connection-role" class="section-name selfRef">Connection Role</a>
+        </h3>
+<p id="section-2.3-1">A connection role describes the functional relationship or responsibility of the subject AS with respect to a specified neighboring AS or inter-domain connection. A role is relative to the connection and may be scoped by route class or operational condition. It is not necessarily a global property of an AS and is not limited to the finite BGP Role values defined in <span>[<a href="#RFC9234" class="cite xref">RFC9234</a>]</span>.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="declared-behavior">
+<section id="section-2.4">
+        <h3 id="name-declared-behavior">
+<a href="#section-2.4" class="section-number selfRef">2.4. </a><a href="#name-declared-behavior" class="section-name selfRef">Declared Behavior</a>
+        </h3>
+<p id="section-2.4-1">Declared behavior is the routing behavior specified by an IRBC. A declaration may express a required behavior, a prohibited behavior, a permitted behavior, or a preference. These categories have different semantics and <span class="bcp14">MUST NOT</span> be treated as interchangeable. The connection role provides context for the behavior but does not, by itself, determine all behavior semantics.<a href="#section-2.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="commitment-context">
+<section id="section-2.5">
+        <h3 id="name-commitment-context">
+<a href="#section-2.5" class="section-number selfRef">2.5. </a><a href="#name-commitment-context" class="section-name selfRef">Commitment Context</a>
+        </h3>
+<p id="section-2.5-1">The commitment context describes the conditions under which declared behavior applies. It may include route scope, neighboring AS, direction, AFI/SAFI, time interval, operational state, exceptions, and precedence among applicable statements. It does not imply a legal contract or a reciprocal commitment by another AS.<a href="#section-2.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="observed-behavior">
+<section id="section-2.6">
+        <h3 id="name-observed-behavior">
+<a href="#section-2.6" class="section-number selfRef">2.6. </a><a href="#name-observed-behavior" class="section-name selfRef">Observed Behavior</a>
+        </h3>
+<p id="section-2.6-1">Observed behavior is information about routing activity or state obtained at a particular observation point and time. Examples include BGP UPDATE messages, Adj-RIB-In or Adj-RIB-Out information, RIB data, BMP feeds, and other operational evidence.<a href="#section-2.6-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="evidence">
+<section id="section-2.7">
+        <h3 id="name-evidence">
+<a href="#section-2.7" class="section-number selfRef">2.7. </a><a href="#name-evidence" class="section-name selfRef">Evidence</a>
+        </h3>
+<p id="section-2.7-1">Evidence is information used to support or refute a claim about observed routing behavior. Evidence has provenance, collection time, observation scope, coverage, and limitations. The absence of an observation is not necessarily evidence that an event did not occur.<a href="#section-2.7-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="external-assessment">
+<section id="section-2.8">
+        <h3 id="name-external-assessment">
+<a href="#section-2.8" class="section-number selfRef">2.8. </a><a href="#name-external-assessment" class="section-name selfRef">External Assessment</a>
+        </h3>
+<p id="section-2.8-1">External assessment is an evaluation of an IRBC by an entity that is independent of, or outside the administrative control of, the issuer. An assessment may report that available evidence supports compliance, supports a violation, or is insufficient to reach either conclusion.<a href="#section-2.8-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="inter-domain-routing-scenarios">
+<section id="section-3">
+      <h2 id="name-inter-domain-routing-scenar">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-inter-domain-routing-scenar" class="section-name selfRef">Inter-Domain Routing Scenarios</a>
+      </h2>
+<div id="route-class-specific-export-commitment">
+<section id="section-3.1">
+        <h3 id="name-route-class-specific-export">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-route-class-specific-export" class="section-name selfRef">Route-Class-Specific Export Commitment</a>
+        </h3>
+<p id="section-3.1-1">AS A has an eBGP connection with AS B and applies different export behavior to different route classes. For example, customer routes may be exported to B, while routes learned from another provider are not exported to B, except under a defined operational condition. AS A can implement this behavior using local import and export policy. Such a policy may also be configured and managed using existing policy models.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">An interconnection intent may specify the desired routing service or associated requirements. The IRBC question is whether AS A can additionally provide an attributable declaration that identifies the route classes, neighbor, direction, exceptions, and conditions for which AS A takes responsibility. An external assessor would need evidence from appropriate observation points to evaluate observed advertisements. A collector that does not observe an advertisement cannot, by that fact alone, prove that AS A did not advertise the route to another neighbor.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="conditional-backup-advertisement">
+<section id="section-3.2">
+        <h3 id="name-conditional-backup-advertis">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-conditional-backup-advertis" class="section-name selfRef">Conditional Backup Advertisement</a>
+        </h3>
+<p id="section-3.2-1">AS A declares that it will advertise a specified route class to backup neighbor AS C only when a defined primary-path condition is met. The commitment <span class="bcp14">MUST</span> distinguish a mandatory condition from a preference and identify the time interval and routing scope to which it applies.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">An external assessment requires evidence about both the advertisement to AS C and the condition claimed to trigger it. A BGP UPDATE observed at one collector may establish that an advertisement occurred at that observation point. It may not establish the complete state of AS A's internal route selection or prove that the primary path was unavailable. The assessment model <span class="bcp14">MUST</span> state when the evidence is sufficient and when the result is indeterminate.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="scope-dependent-interconnection-behavior">
+<section id="section-3.3">
+        <h3 id="name-scope-dependent-interconnec">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-scope-dependent-interconnec" class="section-name selfRef">Scope-Dependent Interconnection Behavior</a>
+        </h3>
+<p id="section-3.3-1">Two ASes may apply different routing arrangements to different route classes over what is operationally viewed as the same interconnection. <span>[<a href="#RFC9234" class="cite xref">RFC9234</a>]</span> calls a peering relationship "Complex" when more than one BGP Role applies between the same ASes, for example when the relationship is Provider-to-Customer for some prefixes and Peer-to-Peer for others. RFC 9234 specifies that BGP Roles are not configured on an eBGP session with a Complex peering relationship. It is worth noting that per-prefix policies may be used, but there are no in-band measures in that specification to check the correctness of the per-prefix peering configuration.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2">This scenario may motivate a route-scope-specific declaration, but it does not establish that IRBC is necessary. The <span class="bcp14">MUST</span> identify exactly what an IRBC would add beyond the per-prefix policy, existing role and OTC behavior, and the available routing evidence. It <span class="bcp14">MUST</span> also consider whether the same requirement can be met by multiple eBGP sessions, RPA objects, or an extension of an existing interconnection-intent representation.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="control-plane-and-data-plane-boundary">
+<section id="section-3.4">
+        <h3 id="name-control-plane-and-data-plan">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-control-plane-and-data-plan" class="section-name selfRef">Control-Plane and Data-Plane Boundary</a>
+        </h3>
+<p id="section-3.4-1">An operator may state an expectation that traffic should traverse a preferred provider or path. However, an AS_PATH observed in the BGP control plane does not necessarily establish the actual data-plane forwarding path. Internal routing, tunnels, policy-based forwarding, ECMP, and other mechanisms may affect packet forwarding.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.4-2">The initial IRBC scope therefore focuses on BGP control-plane behavior, such as route origination, advertisement, propagation, and selected attribute handling. Data-plane commitments are outside the initial scope unless the required data-plane evidence and observation model are separately defined.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="problem-statement">
+<section id="section-4">
+      <h2 id="name-problem-statement">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-problem-statement" class="section-name selfRef">Problem Statement</a>
+      </h2>
+<div id="from-local-policy-to-an-attributable-external-declaration">
+<section id="section-4.1">
+        <h3 id="name-from-local-policy-to-an-att">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-from-local-policy-to-an-att" class="section-name selfRef">From Local Policy to an Attributable External Declaration</a>
+        </h3>
+<p id="section-4.1-1">An AS can implement routing behavior using local policy, but that configuration does not automatically provide another domain with an interoperable statement of the behavior the AS claims it will perform. Conversely, a published statement does not demonstrate that the AS follows it. A model may be useful to distinguish internal policy, an externally understandable commitment, and evidence of actual behavior. The need for a distinct model <span class="bcp14">MUST</span> be evaluated against existing interconnection-intent structures and IBN assurance functions.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="issuer-subject-and-authority">
+<section id="section-4.2">
+        <h3 id="name-issuer-subject-and-authorit">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-issuer-subject-and-authorit" class="section-name selfRef">Issuer, Subject, and Authority</a>
+        </h3>
+<p id="section-4.2-1">A declaration can be assessed only if the assessor can identify the issuer, the AS or routing domain that is the subject, and the authority under which the declaration was made. The relevant authority may concern operation of the AS, address resources, or control of routing policy. These do not necessarily belong to the same entity. A general model <span class="bcp14">MUST NOT</span> assume that possession of an ASN or a prefix resource automatically proves authority to make every routing-policy commitment for an AS.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="scope-and-behavioral-semantics">
+<section id="section-4.3">
+        <h3 id="name-scope-and-behavioral-semant">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-scope-and-behavioral-semant" class="section-name selfRef">Scope and Behavioral Semantics</a>
+        </h3>
+<p id="section-4.3-1">A statement such as "do not export this route" is incomplete without identifying the route, neighbor or neighbor class, address family, direction, time interval, and applicable conditions. A commitment may express a mandatory behavior, a prohibition, a permission, or a preference. These meanings are distinguishable. The model <span class="bcp14">MUST</span> also address overlapping scopes, exceptions, and conflicting statements.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="evidence-and-external-observability">
+<section id="section-4.4">
+        <h3 id="name-evidence-and-external-obser">
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-evidence-and-external-obser" class="section-name selfRef">Evidence and External Observability</a>
+        </h3>
+<p id="section-4.4-1">A commitment does not create the evidence required to assess it. A remote observer may have access to public BGP data, selected route collectors, a limited set of RIBs, BMP feeds, or evidence voluntarily supplied by the issuer. These sources have different coverage and trust properties. BMP defined in <span>[<a href="#RFC7854" class="cite xref">RFC7854</a>]</span> provides a protocol for obtaining route views from BGP speakers. Support for Adj-RIB-Out monitoring is specified in <span>[<a href="#RFC8671" class="cite xref">RFC8671</a>]</span>. Neither a monitoring feed nor a public collector view <span class="bcp14">SHOULD</span> be assumed to provide complete evidence for every neighbor and every route.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<p id="section-4.4-2">The model <span class="bcp14">MUST</span> relate each behavior claim to the evidence needed to assess it and <span class="bcp14">MUST</span> represent observation points, time intervals, provenance, coverage, and limitations. Evidence that a route was observed at one point does not prove that it was or was not advertised to every other neighbor. A missing observation <span class="bcp14">MUST NOT</span> automatically be interpreted as proof that an event did not occur.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="unilateral-and-bilateral-statements">
+<section id="section-4.5">
+        <h3 id="name-unilateral-and-bilateral-st">
+<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-unilateral-and-bilateral-st" class="section-name selfRef">Unilateral and Bilateral Statements</a>
+        </h3>
+<p id="section-4.5-1">An AS may make a unilateral declaration about its own behavior. A bilateral interconnection arrangement may require corresponding declarations or an explicit agreement by both parties. A declaration from AS A cannot establish consent or a commitment by AS B. A model <span class="bcp14">MUST</span> preserve the identity and authority of each issuer and provide a way to represent disagreement or inconsistent declarations without silently treating one party's statement as authoritative for the other.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="assessment-and-uncertainty">
+<section id="section-4.6">
+        <h3 id="name-assessment-and-uncertainty">
+<a href="#section-4.6" class="section-number selfRef">4.6. </a><a href="#name-assessment-and-uncertainty" class="section-name selfRef">Assessment and Uncertainty</a>
+        </h3>
+<p id="section-4.6-1">The available evidence may support compliance, support a violation, or be insufficient to reach either conclusion. A binary result is therefore not always appropriate. An assessment model <span class="bcp14">SHOULD</span> distinguish:<a href="#section-4.6-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.6-2.1">
+            <p id="section-4.6-2.1.1">Compliant: the available evidence supports that the declared behavior was followed within the stated scope and assessment conditions.<a href="#section-4.6-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.6-2.2">
+            <p id="section-4.6-2.2.1">Violation: the available evidence supports that the declared behavior was not followed within the stated scope and assessment conditions.<a href="#section-4.6-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.6-2.3">
+            <p id="section-4.6-2.3.1">Indeterminate: the evidence is insufficient, incomplete, conflicting, or inapplicable to reach either conclusion.<a href="#section-4.6-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-4.6-3">These outcomes describe assessment confidence and evidence sufficiency. They do not imply that every routing behavior can be independently verified in all deployments.<a href="#section-4.6-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="lifecycle-and-information-disclosure">
+<section id="section-4.7">
+        <h3 id="name-lifecycle-and-information-d">
+<a href="#section-4.7" class="section-number selfRef">4.7. </a><a href="#name-lifecycle-and-information-d" class="section-name selfRef">Lifecycle and Information Disclosure</a>
+        </h3>
+<p id="section-4.7-1">Routing policies and inter-domain relationships change. A declaration may be updated, superseded, withdrawn, or become inapplicable when a connection or route scope changes. An assessor may retain stale or delayed information. A model <span class="bcp14">MUST</span> address validity, versioning, update, withdrawal, revocation, and the relationship between an observation interval and the applicable declaration version.<a href="#section-4.7-1" class="pilcrow">¶</a></p>
+<p id="section-4.7-2">At the same time, publishing a commitment may reveal sensitive information about topology, customers, peering, or traffic engineering. The model <span class="bcp14">SHOULD</span> identify the minimum information required for a meaningful assessment and the limits imposed by selective disclosure.<a href="#section-4.7-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="positioning-and-gap">
+<section id="section-5">
+      <h2 id="name-positioning-and-gap">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-positioning-and-gap" class="section-name selfRef">Positioning and Gap</a>
+      </h2>
+<p id="section-5-1">The gap is the absence of a cross-domain, attributable, scope-aware, evidence-relative framework​ for expressing and assessing an AS's own BGP behavior commitments. Specifically:<a href="#section-5-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5-2.1">
+          <p id="section-5-2.1.1">No existing mechanism binds a behavior claim to an issuer, subject, and authority​ in a way that an external domain can verify.<a href="#section-5-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-5-2.2">
+          <p id="section-5-2.2.1">No existing mechanism scopes a behavior claim to connection, route class, direction, and condition​ with explicit semantics for mandatory, prohibited, permitted, and preferred behaviors.<a href="#section-5-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-5-2.3">
+          <p id="section-5-2.3.1">No existing mechanism defines how external evidence maps to a compliance assessment, including the explicit representation of indeterminate outcomes.<a href="#section-5-2.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+</section>
+</div>
+<div id="requirements">
+<section id="section-6">
+      <h2 id="name-requirements">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-requirements" class="section-name selfRef">Requirements</a>
+      </h2>
+<div id="issuer-and-subject-attribution">
+<section id="section-6.1">
+        <h3 id="name-issuer-and-subject-attribut">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-issuer-and-subject-attribut" class="section-name selfRef">Issuer and Subject Attribution</a>
+        </h3>
+<p id="section-6.1-1">A model <span class="bcp14">SHOULD</span> identify the issuer, the subject AS or routing domain, and the authority under which the issuer makes the declaration. It <span class="bcp14">SHOULD</span> distinguish self-issued declarations from delegated declarations and <span class="bcp14">SHOULD NOT</span> infer routing-policy authority solely from prefix ownership or ASN registration.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="self-commitment-and-party-separation">
+<section id="section-6.2">
+        <h3 id="name-self-commitment-and-party-s">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-self-commitment-and-party-s" class="section-name selfRef">Self-Commitment and Party Separation</a>
+        </h3>
+<p id="section-6.2-1">A declaration <span class="bcp14">SHOULD</span> be limited to behavior for which the subject or issuer has responsibility. It <span class="bcp14">MUST NOT</span> imply that another AS has accepted a reciprocal commitment. Where a bilateral arrangement is relevant, each party's declaration and evidence <span class="bcp14">SHOULD</span> remain attributable to that party.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="routing-specific-scope">
+<section id="section-6.3">
+        <h3 id="name-routing-specific-scope">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-routing-specific-scope" class="section-name selfRef">Routing-Specific Scope</a>
+        </h3>
+<p id="section-6.3-1">A model <span class="bcp14">SHOULD</span> support scope dimensions relevant to inter-domain routing, which may include:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.3-2.1">
+            <p id="section-6.3-2.1.1">subject AS and neighboring AS or inter-domain connection<a href="#section-6.3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.3-2.2">
+            <p id="section-6.3-2.2.1">AFI/SAFI<a href="#section-6.3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.3-2.3">
+            <p id="section-6.3-2.3.1">prefix, prefix set, origin AS, or route class<a href="#section-6.3-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.3-2.4">
+            <p id="section-6.3-2.4.1">ingress or egress direction<a href="#section-6.3-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.3-2.5">
+            <p id="section-6.3-2.5.1">relevant BGP behavior, such as origination, advertisement, propagation, or attribute handling<a href="#section-6.3-2.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.3-2.6">
+            <p id="section-6.3-2.6.1">validity interval and operational conditions<a href="#section-6.3-2.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.3-2.7">
+            <p id="section-6.3-2.7.1">explicit exceptions and exclusions.<a href="#section-6.3-2.7.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-6.3-3">These dimensions are a routing-specific application of the intent scope and network scope concepts in <span>[<a href="#RFC9316" class="cite xref">RFC9316</a>]</span>, not a replacement for the general taxonomy.<a href="#section-6.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="behavior-semantics">
+<section id="section-6.4">
+        <h3 id="name-behavior-semantics">
+<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-behavior-semantics" class="section-name selfRef">Behavior Semantics</a>
+        </h3>
+<p id="section-6.4-1">A model <span class="bcp14">SHOULD</span> distinguish mandatory behavior, prohibited behavior, permitted behavior, and preferred behavior. It <span class="bcp14">SHOULD</span> define how conditional statements, exceptions, and precedence are interpreted. A preference <span class="bcp14">MUST NOT</span> be treated as a mandatory obligation, and a permission <span class="bcp14">MUST NOT</span> be treated as a requirement to perform an action.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-2">Connection roles may be included as context for a declaration. They <span class="bcp14">SHOULD NOT</span> be equated with the finite BGP Role values defined in <span>[<a href="#RFC9234" class="cite xref">RFC9234</a>]</span>, nor <span class="bcp14">SHOULD</span> the model redefine the protocol behavior associated with those values.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="claim-to-evidence-relationship">
+<section id="section-6.5">
+        <h3 id="name-claim-to-evidence-relations">
+<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-claim-to-evidence-relations" class="section-name selfRef">Claim-to-Evidence Relationship</a>
+        </h3>
+<p id="section-6.5-1">A model <span class="bcp14">SHOULD</span> identify, for each supported behavior claim, the evidence types that may support an assessment and the limits of those evidence types. Evidence metadata <span class="bcp14">SHOULD</span> include provenance, observation point, collection time, coverage, and integrity properties where available. The model <span class="bcp14">SHOULD</span> permit an indeterminate result when the evidence cannot support a reliable conclusion.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="external-assessment-1">
+<section id="section-6.6">
+        <h3 id="name-external-assessment-2">
+<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-external-assessment-2" class="section-name selfRef">External Assessment</a>
+        </h3>
+<p id="section-6.6-1">A model <span class="bcp14">SHOULD</span> allow an assessor outside the issuer's administrative domain to interpret the declaration and report an assessment without assuming access to the issuer's complete internal configuration or all routing state. It <span class="bcp14">SHOULD</span> state when issuer cooperation or evidence from internal observation points is necessary.<a href="#section-6.6-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="lifecycle-and-consistency">
+<section id="section-6.7">
+        <h3 id="name-lifecycle-and-consistency">
+<a href="#section-6.7" class="section-number selfRef">6.7. </a><a href="#name-lifecycle-and-consistency" class="section-name selfRef">Lifecycle and Consistency</a>
+        </h3>
+<p id="section-6.7-1">A model <span class="bcp14">SHOULD</span> address creation, publication, update, supersession, withdrawal, validity, and revocation. It <span class="bcp14">SHOULD</span> enable an assessor to identify which declaration version applies to a given observation interval and to recognize stale, conflicting, or inconsistent declarations.<a href="#section-6.7-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="disclosure-and-deployment">
+<section id="section-6.8">
+        <h3 id="name-disclosure-and-deployment">
+<a href="#section-6.8" class="section-number selfRef">6.8. </a><a href="#name-disclosure-and-deployment" class="section-name selfRef">Disclosure and Deployment</a>
+        </h3>
+<p id="section-6.8-1">A model <span class="bcp14">SHOULD</span> minimize unnecessary disclosure of internal policy and topology while exposing enough information to make the commitment meaningful and assessable. It <span class="bcp14">SHOULD</span> also consider partial deployment, missing declarations, unsupported behavior types, and unavailable evidence. Absence of an IRBC <span class="bcp14">MUST NOT</span> be interpreted as evidence of misbehavior.<a href="#section-6.8-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-7">
+      <h2 id="name-security-considerations">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-7-1">An externally assessable routing behavior commitment introduces security considerations because declarations may influence how other domains interpret an AS's behavior. This document identifies issues for further and does not specify a complete security architecture.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">An attacker may publish a declaration while impersonating an AS operator or may publish a declaration for an AS that the issuer does not control. A future mechanism needs to authenticate the issuer and determine whether the issuer is authorized to make statements for the subject AS and declared scope. Authority over an ASN, address resources, and routing policy may be held by different entities; these forms of authority <span class="bcp14">MUST NOT</span> be conflated.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">A declaration may be modified, substituted, replayed, or rolled back to an earlier version. A future model needs to consider integrity protection, version identification, validity intervals, freshness, update, withdrawal, and revocation.<a href="#section-7-3" class="pilcrow">¶</a></p>
+<p id="section-7-4">An issuer may provide different declarations to different observers, intentionally or accidentally. A signature on an individual declaration does not by itself prevent equivocation. Further work may need to consider consistency mechanisms, auditability, or transparency services.<a href="#section-7-4" class="pilcrow">¶</a></p>
+<p id="section-7-5">An authentic declaration may describe behavior that the issuer does not follow. Authentication establishes the origin of a declaration, not compliance with it. Assessment requires appropriate evidence and <span class="bcp14">MUST</span> account for incomplete observation and the possibility that some behavior is not externally observable.<a href="#section-7-5" class="pilcrow">¶</a></p>
+<p id="section-7-6">Evidence may be forged, altered, selectively disclosed, or collected from insufficient observation points. A future framework needs to state the trust placed in routers, collectors, monitoring systems, and evidence providers. It <span class="bcp14">MUST NOT</span> treat an absence of data as proof that an event did not occur.<a href="#section-7-6" class="pilcrow">¶</a></p>
+<p id="section-7-7">Large numbers of declarations, overlapping scopes, or complex conditional statements may increase storage, distribution, and assessment costs. A future design <span class="bcp14">SHOULD</span> consider bounded complexity, resource limits, and input validation.<a href="#section-7-7" class="pilcrow">¶</a></p>
+<p id="section-7-8">Declarations may reveal topology, peering relationships, customer categories, or traffic-engineering preferences. A future design <span class="bcp14">SHOULD</span> evaluate what information <span class="bcp14">MUST</span> be disclosed to support a meaningful assessment and what information can remain internal.<a href="#section-7-8" class="pilcrow">¶</a></p>
+<p id="section-7-9">An assessor may apply a declaration outside its scope or confuse a preference with a mandatory behavior. A declaration by one AS <span class="bcp14">MUST NOT</span> be interpreted as proof that another AS has agreed to a reciprocal behavior. Scope, conditions, exceptions, and issuer responsibility <span class="bcp14">MUST</span> therefore be explicit.<a href="#section-7-9" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="iana-considerations">
+<section id="section-8">
+      <h2 id="name-iana-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-8-1">This document has no IANA actions.<a href="#section-8-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-9">
+      <h2 id="name-references">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-9.1">
+        <h3 id="name-normative-references">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4271">[RFC4271]</dt>
+        <dd>
+<span class="refAuthor">Rekhter, Y., Ed.</span>, <span class="refAuthor">Li, T., Ed.</span>, and <span class="refAuthor">S. Hares, Ed.</span>, <span class="refTitle">"A Border Gateway Protocol 4 (BGP-4)"</span>, <span class="seriesInfo">RFC 4271</span>, <span class="seriesInfo">DOI 10.17487/RFC4271</span>, <time datetime="2006-01" class="refDate">January 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4271">https://www.rfc-editor.org/rfc/rfc4271</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9234">[RFC9234]</dt>
+      <dd>
+<span class="refAuthor">Azimov, A.</span>, <span class="refAuthor">Bogomazov, E.</span>, <span class="refAuthor">Bush, R.</span>, <span class="refAuthor">Patel, K.</span>, and <span class="refAuthor">K. Sriram</span>, <span class="refTitle">"Route Leak Prevention and Detection Using Roles in UPDATE and OPEN Messages"</span>, <span class="seriesInfo">RFC 9234</span>, <span class="seriesInfo">DOI 10.17487/RFC9234</span>, <time datetime="2022-05" class="refDate">May 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9234">https://www.rfc-editor.org/rfc/rfc9234</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-9.2">
+        <h3 id="name-informative-references">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="I-D.contreras-nmrg-interconnection-intents">[I-D.contreras-nmrg-interconnection-intents]</dt>
+        <dd>
+<span class="refAuthor">Contreras, L. M.</span>, <span class="refAuthor">Lucente, P.</span>, and <span class="refAuthor">T. H. Velivassaki</span>, <span class="refTitle">"Interconnection Intents"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-contreras-nmrg-interconnection-intents-05</span>, <time datetime="2024-07-08" class="refDate">8 July 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-contreras-nmrg-interconnection-intents-05">https://datatracker.ietf.org/doc/html/draft-contreras-nmrg-interconnection-intents-05</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-sidrops-aspa-profile">[I-D.ietf-sidrops-aspa-profile]</dt>
+        <dd>
+<span class="refAuthor">Snijders, J.</span>, <span class="refAuthor">Azimov, A.</span>, <span class="refAuthor">Uskov, E.</span>, <span class="refAuthor">Bush, R.</span>, <span class="refAuthor">Housley, R.</span>, and <span class="refAuthor">B. Maddison</span>, <span class="refTitle">"A Profile for Autonomous System Provider Authorization"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-sidrops-aspa-profile-30</span>, <time datetime="2026-10-29" class="refDate">29 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-profile-30">https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-profile-30</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-sidrops-aspa-verification">[I-D.ietf-sidrops-aspa-verification]</dt>
+        <dd>
+<span class="refAuthor">Azimov, A.</span>, <span class="refAuthor">Bogomazov, E.</span>, <span class="refAuthor">Bush, R.</span>, <span class="refAuthor">Patel, K.</span>, <span class="refAuthor">Snijders, J.</span>, and <span class="refAuthor">K. Sriram</span>, <span class="refTitle">"BGP AS_PATH Verification Based on Autonomous System Provider Authorization (ASPA) Objects"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-sidrops-aspa-verification-29</span>, <time datetime="2026-10-16" class="refDate">16 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-verification-29">https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-verification-29</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.irtf-nmrg-ibn-usecases">[I-D.irtf-nmrg-ibn-usecases]</dt>
+        <dd>
+<span class="refAuthor">Yao, K.</span>, <span class="refAuthor">Chen, D.</span>, <span class="refAuthor">Jeong, J. P.</span>, <span class="refAuthor">Wu, Q.</span>, <span class="refAuthor">Yang, C.</span>, <span class="refAuthor">Contreras, L. M.</span>, and <span class="refAuthor">G. Fioccola</span>, <span class="refTitle">"Use Cases and Practices for Intent-Based Networking"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-irtf-nmrg-ibn-usecases-04</span>, <time datetime="2026-10-27" class="refDate">27 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-irtf-nmrg-ibn-usecases-04">https://datatracker.ietf.org/doc/html/draft-irtf-nmrg-ibn-usecases-04</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC1997">[RFC1997]</dt>
+        <dd>
+<span class="refAuthor">Chandra, R.</span>, <span class="refAuthor">Traina, P.</span>, and <span class="refAuthor">T. Li</span>, <span class="refTitle">"BGP Communities Attribute"</span>, <span class="seriesInfo">RFC 1997</span>, <span class="seriesInfo">DOI 10.17487/RFC1997</span>, <time datetime="1996-08" class="refDate">August 1996</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1997">https://www.rfc-editor.org/rfc/rfc1997</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2622">[RFC2622]</dt>
+        <dd>
+<span class="refAuthor">Alaettinoglu, C.</span>, <span class="refAuthor">Villamizar, C.</span>, <span class="refAuthor">Gerich, E.</span>, <span class="refAuthor">Kessens, D.</span>, <span class="refAuthor">Meyer, D.</span>, <span class="refAuthor">Bates, T.</span>, <span class="refAuthor">Karrenberg, D.</span>, and <span class="refAuthor">M. Terpstra</span>, <span class="refTitle">"Routing Policy Specification Language (RPSL)"</span>, <span class="seriesInfo">RFC 2622</span>, <span class="seriesInfo">DOI 10.17487/RFC2622</span>, <time datetime="1999-06" class="refDate">June 1999</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2622">https://www.rfc-editor.org/rfc/rfc2622</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4012">[RFC4012]</dt>
+        <dd>
+<span class="refAuthor">Blunk, L.</span>, <span class="refAuthor">Damas, J.</span>, <span class="refAuthor">Parent, F.</span>, and <span class="refAuthor">A. Robachevsky</span>, <span class="refTitle">"Routing Policy Specification Language next generation (RPSLng)"</span>, <span class="seriesInfo">RFC 4012</span>, <span class="seriesInfo">DOI 10.17487/RFC4012</span>, <time datetime="2005-03" class="refDate">March 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4012">https://www.rfc-editor.org/rfc/rfc4012</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4360">[RFC4360]</dt>
+        <dd>
+<span class="refAuthor">Sangli, S.</span>, <span class="refAuthor">Tappan, D.</span>, and <span class="refAuthor">Y. Rekhter</span>, <span class="refTitle">"BGP Extended Communities Attribute"</span>, <span class="seriesInfo">RFC 4360</span>, <span class="seriesInfo">DOI 10.17487/RFC4360</span>, <time datetime="2006-02" class="refDate">February 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4360">https://www.rfc-editor.org/rfc/rfc4360</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6811">[RFC6811]</dt>
+        <dd>
+<span class="refAuthor">Mohapatra, P.</span>, <span class="refAuthor">Scudder, J.</span>, <span class="refAuthor">Ward, D.</span>, <span class="refAuthor">Bush, R.</span>, and <span class="refAuthor">R. Austein</span>, <span class="refTitle">"BGP Prefix Origin Validation"</span>, <span class="seriesInfo">RFC 6811</span>, <span class="seriesInfo">DOI 10.17487/RFC6811</span>, <time datetime="2013-01" class="refDate">January 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6811">https://www.rfc-editor.org/rfc/rfc6811</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7454">[RFC7454]</dt>
+        <dd>
+<span class="refAuthor">Durand, J.</span>, <span class="refAuthor">Pepelnjak, I.</span>, and <span class="refAuthor">G. Doering</span>, <span class="refTitle">"BGP Operations and Security"</span>, <span class="seriesInfo">BCP 194</span>, <span class="seriesInfo">RFC 7454</span>, <span class="seriesInfo">DOI 10.17487/RFC7454</span>, <time datetime="2015-02" class="refDate">February 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7454">https://www.rfc-editor.org/rfc/rfc7454</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7854">[RFC7854]</dt>
+        <dd>
+<span class="refAuthor">Scudder, J., Ed.</span>, <span class="refAuthor">Fernando, R.</span>, and <span class="refAuthor">S. Stuart</span>, <span class="refTitle">"BGP Monitoring Protocol (BMP)"</span>, <span class="seriesInfo">RFC 7854</span>, <span class="seriesInfo">DOI 10.17487/RFC7854</span>, <time datetime="2016-06" class="refDate">June 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7854">https://www.rfc-editor.org/rfc/rfc7854</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7908">[RFC7908]</dt>
+        <dd>
+<span class="refAuthor">Sriram, K.</span>, <span class="refAuthor">Montgomery, D.</span>, <span class="refAuthor">McPherson, D.</span>, <span class="refAuthor">Osterweil, E.</span>, and <span class="refAuthor">B. Dickson</span>, <span class="refTitle">"Problem Definition and Classification of BGP Route Leaks"</span>, <span class="seriesInfo">RFC 7908</span>, <span class="seriesInfo">DOI 10.17487/RFC7908</span>, <time datetime="2016-06" class="refDate">June 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7908">https://www.rfc-editor.org/rfc/rfc7908</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8092">[RFC8092]</dt>
+        <dd>
+<span class="refAuthor">Heitz, J., Ed.</span>, <span class="refAuthor">Snijders, J., Ed.</span>, <span class="refAuthor">Patel, K.</span>, <span class="refAuthor">Bagdonas, I.</span>, and <span class="refAuthor">N. Hilliard</span>, <span class="refTitle">"BGP Large Communities Attribute"</span>, <span class="seriesInfo">RFC 8092</span>, <span class="seriesInfo">DOI 10.17487/RFC8092</span>, <time datetime="2017-02" class="refDate">February 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8092">https://www.rfc-editor.org/rfc/rfc8092</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8205">[RFC8205]</dt>
+        <dd>
+<span class="refAuthor">Lepinski, M., Ed.</span> and <span class="refAuthor">K. Sriram, Ed.</span>, <span class="refTitle">"BGPsec Protocol Specification"</span>, <span class="seriesInfo">RFC 8205</span>, <span class="seriesInfo">DOI 10.17487/RFC8205</span>, <time datetime="2017-09" class="refDate">September 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8205">https://www.rfc-editor.org/rfc/rfc8205</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8212">[RFC8212]</dt>
+        <dd>
+<span class="refAuthor">Mauch, J.</span>, <span class="refAuthor">Snijders, J.</span>, and <span class="refAuthor">G. Hankins</span>, <span class="refTitle">"Default External BGP (EBGP) Route Propagation Behavior without Policies"</span>, <span class="seriesInfo">RFC 8212</span>, <span class="seriesInfo">DOI 10.17487/RFC8212</span>, <time datetime="2017-07" class="refDate">July 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8212">https://www.rfc-editor.org/rfc/rfc8212</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8671">[RFC8671]</dt>
+        <dd>
+<span class="refAuthor">Evens, T.</span>, <span class="refAuthor">Bayraktar, S.</span>, <span class="refAuthor">Lucente, P.</span>, <span class="refAuthor">Mi, P.</span>, and <span class="refAuthor">S. Zhuang</span>, <span class="refTitle">"Support for Adj-RIB-Out in the BGP Monitoring Protocol (BMP)"</span>, <span class="seriesInfo">RFC 8671</span>, <span class="seriesInfo">DOI 10.17487/RFC8671</span>, <time datetime="2019-11" class="refDate">November 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8671">https://www.rfc-editor.org/rfc/rfc8671</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8893">[RFC8893]</dt>
+        <dd>
+<span class="refAuthor">Bush, R.</span>, <span class="refAuthor">Volk, R.</span>, and <span class="refAuthor">J. Heitz</span>, <span class="refTitle">"Resource Public Key Infrastructure (RPKI) Origin Validation for BGP Export"</span>, <span class="seriesInfo">RFC 8893</span>, <span class="seriesInfo">DOI 10.17487/RFC8893</span>, <time datetime="2020-09" class="refDate">September 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8893">https://www.rfc-editor.org/rfc/rfc8893</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9067">[RFC9067]</dt>
+        <dd>
+<span class="refAuthor">Qu, Y.</span>, <span class="refAuthor">Tantsura, J.</span>, <span class="refAuthor">Lindem, A.</span>, and <span class="refAuthor">X. Liu</span>, <span class="refTitle">"A YANG Data Model for Routing Policy"</span>, <span class="seriesInfo">RFC 9067</span>, <span class="seriesInfo">DOI 10.17487/RFC9067</span>, <time datetime="2021-10" class="refDate">October 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9067">https://www.rfc-editor.org/rfc/rfc9067</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9315">[RFC9315]</dt>
+        <dd>
+<span class="refAuthor">Clemm, A.</span>, <span class="refAuthor">Ciavaglia, L.</span>, <span class="refAuthor">Granville, L. Z.</span>, and <span class="refAuthor">J. Tantsura</span>, <span class="refTitle">"Intent-Based Networking - Concepts and Definitions"</span>, <span class="seriesInfo">RFC 9315</span>, <span class="seriesInfo">DOI 10.17487/RFC9315</span>, <time datetime="2022-10" class="refDate">October 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9315">https://www.rfc-editor.org/rfc/rfc9315</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9316">[RFC9316]</dt>
+        <dd>
+<span class="refAuthor">Li, C.</span>, <span class="refAuthor">Havel, O.</span>, <span class="refAuthor">Olariu, A.</span>, <span class="refAuthor">Martinez-Julia, P.</span>, <span class="refAuthor">Nobre, J.</span>, and <span class="refAuthor">D. Lopez</span>, <span class="refTitle">"Intent Classification"</span>, <span class="seriesInfo">RFC 9316</span>, <span class="seriesInfo">DOI 10.17487/RFC9316</span>, <time datetime="2022-10" class="refDate">October 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9316">https://www.rfc-editor.org/rfc/rfc9316</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9582">[RFC9582]</dt>
+      <dd>
+<span class="refAuthor">Snijders, J.</span>, <span class="refAuthor">Maddison, B.</span>, <span class="refAuthor">Lepinski, M.</span>, <span class="refAuthor">Kong, D.</span>, and <span class="refAuthor">S. Kent</span>, <span class="refTitle">"A Profile for Route Origin Authorizations (ROAs)"</span>, <span class="seriesInfo">RFC 9582</span>, <span class="seriesInfo">DOI 10.17487/RFC9582</span>, <time datetime="2024-05" class="refDate">May 2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9582">https://www.rfc-editor.org/rfc/rfc9582</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="scope-and-non-goals">
+<section id="appendix-A">
+      <h2 id="name-scope-and-non-goals">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-scope-and-non-goals" class="section-name selfRef">Scope and Non-Goals</a>
+      </h2>
+<p id="appendix-A-1">This document focuses on the problem statement and requirements for issuer-attributable, externally assessable routing behavior commitments in inter-domain BGP environments.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">The following topics are outside the scope of this document:<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-A-3.1">
+          <p id="appendix-A-3.1.1">redefining the general concepts, taxonomy, lifecycle, or architecture of IBN<a href="#appendix-A-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-3.2">
+          <p id="appendix-A-3.2.1">defining a general-purpose intent language, schema, ontology, or translation engine<a href="#appendix-A-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-3.3">
+          <p id="appendix-A-3.3.1">defining an IBN controller, multi-domain orchestrator, policy compiler, or closed-loop automation architecture<a href="#appendix-A-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-3.4">
+          <p id="appendix-A-3.4.1">defining a general interconnection-intent model or replacing the work in <span>[<a href="#I-D.contreras-nmrg-interconnection-intents" class="cite xref">I-D.contreras-nmrg-interconnection-intents</a>]</span><a href="#appendix-A-3.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-3.5">
+          <p id="appendix-A-3.5.1">defining a complete routing-policy language or replacing RPSL or Routing Policy YANG<a href="#appendix-A-3.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-3.6">
+          <p id="appendix-A-3.6.1">defining an IRBC wire format, serialization, or information model<a href="#appendix-A-3.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-3.7">
+          <p id="appendix-A-3.7.1">defining a new BGP attribute, community, capability, or AFI/SAFI<a href="#appendix-A-3.7.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-3.8">
+          <p id="appendix-A-3.8.1">defining an RPKI signed-object profile, trust-anchor model, or distribution protocol<a href="#appendix-A-3.8.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-3.9">
+          <p id="appendix-A-3.9.1">defining a universal verification algorithm or claiming that all routing behavior can be externally verified<a href="#appendix-A-3.9.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-3.10">
+          <p id="appendix-A-3.10.1">replacing ROA/ROV, ASPA, ASRA, RPA, BGPsec, FC-BGP, BGP Roles, or OTC<a href="#appendix-A-3.10.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-3.11">
+          <p id="appendix-A-3.11.1">defining data-plane forwarding commitments in the absence of a corresponding evidence model.<a href="#appendix-A-3.11.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="appendix-A-4">IBN systems may be used to generate, manage, or assess routing behavior commitments. Existing routing-security mechanisms may provide authorization or evidence relevant to an assessment. Any future protocol or information-model work requires separate analysis and coordination with the appropriate IETF or IRTF groups.<a href="#appendix-A-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="relationship-to-existing-and-mechanisms">
+<section id="appendix-B">
+      <h2 id="name-relationship-to-existing-an">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-relationship-to-existing-an" class="section-name selfRef">Relationship to Existing and Mechanisms</a>
+      </h2>
+<p id="appendix-B-1">This section identifies the capabilities that an IRBC model would reuse and the areas that require further investigation. It does not imply that the referenced work is deficient or that an IRBC <span class="bcp14">MUST</span> be implemented as a new protocol object.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<div id="ibn">
+<section id="appendix-B.1">
+        <h3 id="name-ibn">
+<a href="#appendix-B.1" class="section-number selfRef">B.1. </a><a href="#name-ibn" class="section-name selfRef">IBN</a>
+        </h3>
+<p id="appendix-B.1-1">IRBC is related to IBN, but it is not a replacement for or a new version of the general IBN model. IRBC and IBN operate at different levels of abstraction and address different questions. IBN is a management paradigm that translates operator goals into network actions and closes the loop through monitoring and assurance. IRBC is a cross-domain declaration and assessment paradigm. IRBC asks how an AS can make an attributable, scoped statement about its own BGP behavior, and how an external domain can evaluate that statement using limited evidence. An IBN system <span class="bcp14">MAY</span> consume or produce IRBCs, but IRBC does not depend on an IBN system for its definition or validity.<a href="#appendix-B.1-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-2"><span>[<a href="#RFC9315" class="cite xref">RFC9315</a>]</span> describes general IBN concepts and functions, including intent fulfillment, intent translation, orchestration, monitoring, intent compliance assessment, and the intent lifecycle. <span>[<a href="#RFC9316" class="cite xref">RFC9316</a>]</span> provides a methodology for classifying intents, including intent users, intent types, intent scope, network scope, abstraction, and lifecycle. This document reuses these foundations and does not define another general intent taxonomy or lifecycle.<a href="#appendix-B.1-2" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-3">An IRBC is a routing-specific declaration associated with an AS's responsibility for its own inter-domain routing behavior. It is more explicit and technically scoped than a high-level service goal. An IBN system may derive an IRBC from an operator's intent and local policy, exchange it with another domain, and use monitoring or evidence services to assess it. Those IBN system functions are outside the definition of an IRBC.<a href="#appendix-B.1-3" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-4">The distinction from general Intent Assurance is also specific. <span>[<a href="#RFC9315" class="cite xref">RFC9315</a>]</span> already describes the comparison of observed network behavior with intended behavior. The question here is how such assurance applies when the declaration is attributable to one AS, the assessor belongs to another administrative domain, and the evidence is limited to what can be obtained or trusted across that boundary. This document therefore investigates a routing-specific external-assessment problem; it does not claim to introduce the general concept of assurance.<a href="#appendix-B.1-4" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-5"><span>[<a href="#RFC9315" class="cite xref">RFC9315</a>]</span> defines general IBN concepts and functions, including intent fulfillment and intent assurance. In particular, Intent Assurance compares observed network behavior with the behavior expected by an intent. <span>[<a href="#RFC9316" class="cite xref">RFC9316</a>]</span> provides dimensions for classifying intents, including user, type, scope, network scope, abstraction, and lifecycle. IRBC <span class="bcp14">SHOULD</span> reuse these foundations. It <span class="bcp14">SHOULD NOT</span> introduce a second general definition of intent, a competing intent taxonomy, a new generic intent-scope model, or a separate generic intent lifecycle. The routing-specific question under consideration is whether a declaration attributable to a particular AS or authorized operator, and intended to be assessed by another administrative domain, requires additional semantics beyond the general IBN concepts.<a href="#appendix-B.1-5" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-6"><span>[<a href="#I-D.irtf-nmrg-ibn-usecases" class="cite xref">I-D.irtf-nmrg-ibn-usecases</a>]</span> discusses IBN for routing and path selection, including service-function chaining and SRv6-oriented scenarios. It also includes an IBN-for-Interconnection scenario in which one provider selects an interconnection intent and specifies target resources, another provider maps intent types to protocols or APIs and establishes or provisions the requested resources, and monitoring information is collected and analyzed during the assurance phase. This work already covers routing-related intent, interconnection fulfillment, monitoring-based assurance, and multi-domain intent considerations. IRBC <span class="bcp14">MUST NOT</span> be presented as filling a general absence of these capabilities. Its proposed focus is narrower: a declaration attributable to the subject AS about that AS's own BGP control-plane behavior, together with the evidence semantics relevant to an assessor outside the subject's administrative domain.<a href="#appendix-B.1-6" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-7"><span>[<a href="#I-D.contreras-nmrg-interconnection-intents" class="cite xref">I-D.contreras-nmrg-interconnection-intents</a>]</span> considers the use of intents to express advanced interconnection requirements beyond traditional IP peering. It discusses interconnection intent types, an intent lifecycle, protocol aspects, and a declarative intent structure. The structure includes Expectation, Target, Condition, and Context. Its conventional IP peering example includes peer AS identification, peer IP address, peering authentication, and traffic levels. Its fulfillment and assurance procedures describe a provider requesting or specifying resources, a provider mapping intent to protocols or APIs and provisioning resources, monitoring telemetry, internal checks of committed service-level objectives, and reporting or analyzing metrics against the request.<a href="#appendix-B.1-7" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-8"><span>[<a href="#I-D.irtf-nmrg-ibn-usecases" class="cite xref">I-D.irtf-nmrg-ibn-usecases</a>]</span> also refers to the interconnection-intent work when describing its interconnection scenario. Accordingly, IRBC <span class="bcp14">MUST NOT</span> claim novelty for cross-domain intent expression, peer identification, intent targets, conditions, context, fulfillment, or monitoring-based service assurance.<a href="#appendix-B.1-8" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-9">The distinction investigated by IRBC is narrower and concerns the object and responsibility of the declaration. An interconnection intent can express a request, expectation, or desired service outcome involving capabilities or resources offered by another provider. An IRBC instead concerns a statement made by an AS about routing behavior for which that AS takes responsibility. The distinction is not absolute: an interconnection intent may include provider-side behavior expectations, and an IBN assurance system may assess those expectations. The question is whether a reusable AS-attributable declaration, specifically scoped to BGP behavior and designed for assessment by an external domain, provides semantics that are not adequately captured by the existing interconnection-intent model and its assurance workflow.<a href="#appendix-B.1-9" class="pilcrow">¶</a></p>
+<p id="appendix-B.1-10">An interconnection intent and an IRBC may be related. An interconnection intent may lead to an operator configuring behavior and issuing one or more IRBCs; an IRBC may provide a declaration that an interconnection-intent assurance process can consume. Conversely, an IRBC may exist without a preceding bilateral interconnection-intent exchange. The two concepts <span class="bcp14">SHOULD NOT</span> be assumed to be separate protocol objects until this relationship has been evaluated through concrete scenarios.<a href="#appendix-B.1-10" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="bgp-policy-and-policy-representation">
+<section id="appendix-B.2">
+        <h3 id="name-bgp-policy-and-policy-repre">
+<a href="#appendix-B.2" class="section-number selfRef">B.2. </a><a href="#name-bgp-policy-and-policy-repre" class="section-name selfRef">BGP Policy and Policy Representation</a>
+        </h3>
+<p id="appendix-B.2-1">BGP policy controls route import, selection, and export <span>[<a href="#RFC4271" class="cite xref">RFC4271</a>]</span>. Operational guidance describes common BGP security and policy practices <span>[<a href="#RFC7454" class="cite xref">RFC7454</a>]</span>. RPSL provides a language for describing routing policies <span>[<a href="#RFC2622" class="cite xref">RFC2622</a>]</span>; RPSLng extends this approach to IPv6 routing policy <span>[<a href="#RFC4012" class="cite xref">RFC4012</a>]</span>; and the Routing Policy YANG Data Model provides a vendor-neutral model for configuring and managing routing policy <span>[<a href="#RFC9067" class="cite xref">RFC9067</a>]</span>. BGP Communities <span>[<a href="#RFC1997" class="cite xref">RFC1997</a>]</span>, Extended Communities <span>[<a href="#RFC4360" class="cite xref">RFC4360</a>]</span>, and Large Communities <span>[<a href="#RFC8092" class="cite xref">RFC8092</a>]</span> can carry operator-defined signaling information. <span>[<a href="#RFC8212" class="cite xref">RFC8212</a>]</span> defines default eBGP route propagation behavior when import or export policy is absent.<a href="#appendix-B.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.2-2">These mechanisms demonstrate that routing policy can be configured, represented, and signaled. IRBC <span class="bcp14">MUST NOT</span> claim that routing policy cannot be expressed or that BGP has no means to carry policy-related information. The question is whether a policy representation or signal, by itself, also identifies an authorized issuer, states an externally understandable commitment for a defined scope, and provides semantics for assessing the commitment using evidence obtained from another domain. These properties depend on the applicable policy model, trust relationships, and evidence mechanisms; they are not automatically provided by the existence of a policy language or community value.<a href="#appendix-B.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="routing-security-mechanisms">
+<section id="appendix-B.3">
+        <h3 id="name-routing-security-mechanisms">
+<a href="#appendix-B.3" class="section-number selfRef">B.3. </a><a href="#name-routing-security-mechanisms" class="section-name selfRef">Routing-Security Mechanisms</a>
+        </h3>
+<p id="appendix-B.3-1">RPKI Route Origin Authorizations (ROAs) defined in <span>[<a href="#RFC9582" class="cite xref">RFC9582</a>]</span> provide digitally signed authorization for an AS to originate routes to specified prefixes. BGP Prefix Origin Validation defined in <span>[<a href="#RFC6811" class="cite xref">RFC6811</a>]</span> defines how a BGP speaker determines the origin-validation state of a route. Operational guidance for applying origin validation on eBGP export is provided by <span>[<a href="#RFC8893" class="cite xref">RFC8893</a>]</span>. ASPA provides signed provider-authorization information, and ASPA-based AS_PATH verification is specified in current SIDROPS work <span>[<a href="#I-D.ietf-sidrops-aspa-profile" class="cite xref">I-D.ietf-sidrops-aspa-profile</a>]</span> <span>[<a href="#I-D.ietf-sidrops-aspa-verification" class="cite xref">I-D.ietf-sidrops-aspa-verification</a>]</span>. BGPsec defined in <span>[<a href="#RFC8205" class="cite xref">RFC8205</a>]</span> provides cryptographic protection for AS_PATH propagation information in BGP UPDATE messages .<a href="#appendix-B.3-1" class="pilcrow">¶</a></p>
+<p id="appendix-B.3-2">IRBC is not a replacement for ROA/ROV, ASPA, BGPsec, BGP Roles, or OTC. Any proposed routing-behavior semantics <span class="bcp14">MUST</span> be shown to add value beyond the specific authorization and propagation properties already addressed by those mechanisms and <span class="bcp14">MUST</span> coexist with them.<a href="#appendix-B.3-2" class="pilcrow">¶</a></p>
+<p id="appendix-B.3-3">BGP Roles and the Only-to-Customer (OTC) defined in <span>[<a href="#RFC9234" class="cite xref">RFC9234</a>]</span> attribute define role negotiation and specific route-leak prevention and detection behavior. The working definition and classification of BGP route leaks are described in <span>[<a href="#RFC7908" class="cite xref">RFC7908</a>]</span>. <span>[<a href="#RFC9234" class="cite xref">RFC9234</a>]</span> defines a finite set of BGP Roles for eBGP sessions and corresponding route-propagation rules. It also identifies complex peering relationships, for which BGP Roles are not configured on a single eBGP session, and notes that per-prefix policies may be used without in-band measures to check the correctness of the per-prefix peering configuration. These details are relevant to scope-dependent routing behavior, but IRBC <span class="bcp14">MUST NOT</span> redefine BGP Role or OTC semantics.<a href="#appendix-B.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-C">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Yangfei Guo</span></div>
+<div dir="auto" class="left"><span class="org">Zhongguancun Laboratory</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:guoyangfei@zgclab.edu.cn" class="email">guoyangfei@zgclab.edu.cn</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Ke Xu</span></div>
+<div dir="auto" class="left"><span class="org">Tsinghua University</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:xuke@tsinghua.edu.cn" class="email">xuke@tsinghua.edu.cn</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Xiaoliang Wang</span></div>
+<div dir="auto" class="left"><span class="org">Tsinghua University</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:wangxiaoliang0623@foxmail.com" class="email">wangxiaoliang0623@foxmail.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
