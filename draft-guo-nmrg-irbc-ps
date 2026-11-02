@@ -1,0 +1,318 @@
+---
+title: "Inter-Domain Routing Behavior Commitments: Problem Statement and Requirements"
+abbrev: "IRBC Problem Statement"
+docname: draft-guo-nmrg-irbc-ps-latest
+submissiontype: IRTF
+cat: info
+ipr: trust200902
+date:
+wg: "Network Management Research Group"
+kw:
+stand_alone: yes
+pi:
+  toc: yes
+  sortrefs: yes
+  symrefs: yes
+author:
+  - fullname: "Yangfei Guo"
+    org: "Zhongguancun Laboratory"
+    email: "guoyangfei@zgclab.edu.cn"
+  - fullname: "Ke Xu"
+    org: "Tsinghua University"
+    email: "xuke@tsinghua.edu.cn"
+  - fullname: "Xiaoliang Wang"
+    org: "Tsinghua University"
+    email: "wangxiaoliang0623@foxmail.com"
+
+normative:
+  RFC4271:
+  RFC9234:
+informative:
+  RFC1997:
+  RFC2622:
+  RFC4012:
+  RFC4360:
+  RFC6811:
+  RFC7454:
+  RFC7854:
+  RFC7908:
+  RFC8092:
+  RFC8205:
+  RFC8212:
+  RFC8671:
+  RFC8893:
+  RFC9067:
+  RFC9315:
+  RFC9316:
+  RFC9582:
+  I-D.irtf-nmrg-ibn-usecases:
+  I-D.contreras-nmrg-interconnection-intents:
+  I-D.ietf-sidrops-aspa-profile:
+  I-D.ietf-sidrops-aspa-verification:
+---
+
+--- abstract
+
+This document examines whether a routing-specific commitment model is useful for expressing and assessing an AS's own expected BGP behavior across administrative-domain boundaries. An Inter-Domain Routing Behavior Commitment (IRBC) is a candidate declaration. It is attributable to an issuer and applies to specific inter-domain connections, route scopes, directions, and operating conditions. Its semantics include the subject AS's connection role, the associated routing behavior, and a commitment context that defines scope, conditions, exceptions, and validity.
+
+The document distinguishes an IRBC from a general IBN intent, an interconnection service request, local routing policy, route-path authorization, and cryptographic evidence of an individual route-propagation event.
+
+--- middle
+
+# Introduction
+
+The Border Gateway Protocol (BGP) defined in {{RFC4271}} enables independently administered Autonomous Systems (ASes) to exchange reachability information. Each AS determines its routing behavior through local policies, operational procedures, topology, and configuration. An AS may have expectations about how it will originate, accept, select, advertise, or propagate routes for a particular inter-domain connection. An AS operator may make statements about its routing behavior.
+
+These expectations and behaviors can be typically configured using existing routing-policy mechanisms. The issue addressed here is not the absence of mechanisms to configure or signal routing behavior. It is whether a commonly understood, issuer-attributable commitment model adds value by bringing together the identity and authority of the issuer, the AS behavior being declared, the applicable scope and conditions, and the evidence available to an external assessor.
+
+Intent-Based Networking (IBN) provides general concepts for expressing network goals at an appropriate level of abstraction and translating those goals into network actions. IBN also considers monitoring and assurance to assess whether observed network behavior remains consistent with an intent refering to {{RFC9315}}. Intent classification and scope are further discussed in {{RFC9316}}. These concepts provide the general foundation for this document. {{I-D.irtf-nmrg-ibn-usecases}} has considered IBN for routing and path selection, IBN for interconnection, and multi-domain intent resolution. {{I-D.contreras-nmrg-interconnection-intents}} has considered conventional IP peering and more advanced interconnection services.
+
+However, this document examines a more specific question: How can an AS make an attributable declaration about its own expected BGP routing behavior, scoped to defined inter-domain connections and route classes, so that another independently administered domain can understand the declaration and assess it against suitable routing evidence?
+
+A general network intent and a routing behavior commitment may serve different purposes. An intent typically expresses operational goals and desired outcomes for a network or service. A routing behavior commitment is a more explicit statement attributable to a particular AS or an entity authorized to act on its behalf, describing behavior for which that AS takes operational responsibility.
+
+This distinction matters in inter-domain environments. The AS that makes a declaration, the AS that consumes it, and the entity that observes routing behavior may be in different administrative domains. A remote observer may not have access to the issuer's internal policy configuration, complete routing information bases, or all Adj-RIB-Out state. Consequently, a declaration needs to identify the behavior being claimed and its scope, while an assessment needs to state what the available evidence can and cannot establish.
+
+# Conventions and Definitions
+
+{::boilerplate bcp14-tagged}
+
+## Inter-Domain Routing Behavior Commitment
+
+An Inter-Domain Routing Behavior Commitment (IRBC) is a candidate, issuer-attributable declaration in which an AS or an entity authorized to act on its behalf states the routing behavior that the subject AS undertakes to provide or enforce for specified inter-domain connections, route scopes, directions, and operating conditions. An IRBC may identify: (1) the subject's connection role in the specified inter-domain relationship; (2) the associated routing behavior; and (3) the commitment context that defines applicable scope, direction, conditions, exceptions, validity, and responsibility.
+
+The term commitment denotes an attributable operational statement of responsibility. It does not by itself establish that the behavior has been followed, create a legal obligation, or establish a bilateral agreement. The need for a distinct IRBC model, rather than an extension or specialization of an existing interconnection-intent representation, is a question for further.
+
+## Issuer and Subject
+
+The issuer is the entity that creates and publishes or otherwise provides an IRBC. The subject is the AS or routing domain whose behavior is described. The issuer may be the subject itself or an entity authorized to act on its behalf. A future model needs to distinguish authority over an AS number, authority over address resources, and operational authority over routing policy where those authorities differ.
+
+## Connection Role
+
+A connection role describes the functional relationship or responsibility of the subject AS with respect to a specified neighboring AS or inter-domain connection. A role is relative to the connection and may be scoped by route class or operational condition. It is not necessarily a global property of an AS and is not limited to the finite BGP Role values defined in {{RFC9234}}.
+
+## Declared Behavior
+
+Declared behavior is the routing behavior specified by an IRBC. A declaration may express a required behavior, a prohibited behavior, a permitted behavior, or a preference. These categories have different semantics and MUST NOT be treated as interchangeable. The connection role provides context for the behavior but does not, by itself, determine all behavior semantics.
+
+## Commitment Context
+
+The commitment context describes the conditions under which declared behavior applies. It may include route scope, neighboring AS, direction, AFI/SAFI, time interval, operational state, exceptions, and precedence among applicable statements. It does not imply a legal contract or a reciprocal commitment by another AS.
+
+## Observed Behavior
+
+Observed behavior is information about routing activity or state obtained at a particular observation point and time. Examples include BGP UPDATE messages, Adj-RIB-In or Adj-RIB-Out information, RIB data, BMP feeds, and other operational evidence.
+
+## Evidence
+
+Evidence is information used to support or refute a claim about observed routing behavior. Evidence has provenance, collection time, observation scope, coverage, and limitations. The absence of an observation is not necessarily evidence that an event did not occur.
+
+## External Assessment
+
+External assessment is an evaluation of an IRBC by an entity that is independent of, or outside the administrative control of, the issuer. An assessment may report that available evidence supports compliance, supports a violation, or is insufficient to reach either conclusion.
+
+# Inter-Domain Routing Scenarios
+
+## Route-Class-Specific Export Commitment
+
+AS A has an eBGP connection with AS B and applies different export behavior to different route classes. For example, customer routes may be exported to B, while routes learned from another provider are not exported to B, except under a defined operational condition. AS A can implement this behavior using local import and export policy. Such a policy may also be configured and managed using existing policy models.
+
+An interconnection intent may specify the desired routing service or associated requirements. The IRBC question is whether AS A can additionally provide an attributable declaration that identifies the route classes, neighbor, direction, exceptions, and conditions for which AS A takes responsibility. An external assessor would need evidence from appropriate observation points to evaluate observed advertisements. A collector that does not observe an advertisement cannot, by that fact alone, prove that AS A did not advertise the route to another neighbor.
+
+## Conditional Backup Advertisement
+
+AS A declares that it will advertise a specified route class to backup neighbor AS C only when a defined primary-path condition is met. The commitment MUST distinguish a mandatory condition from a preference and identify the time interval and routing scope to which it applies.
+
+An external assessment requires evidence about both the advertisement to AS C and the condition claimed to trigger it. A BGP UPDATE observed at one collector may establish that an advertisement occurred at that observation point. It may not establish the complete state of AS A's internal route selection or prove that the primary path was unavailable. The assessment model MUST state when the evidence is sufficient and when the result is indeterminate.
+
+## Scope-Dependent Interconnection Behavior
+
+Two ASes may apply different routing arrangements to different route classes over what is operationally viewed as the same interconnection. {{RFC9234}} calls a peering relationship "Complex" when more than one BGP Role applies between the same ASes, for example when the relationship is Provider-to-Customer for some prefixes and Peer-to-Peer for others. RFC 9234 specifies that BGP Roles are not configured on an eBGP session with a Complex peering relationship. It is worth noting that per-prefix policies may be used, but there are no in-band measures in that specification to check the correctness of the per-prefix peering configuration.
+
+This scenario may motivate a route-scope-specific declaration, but it does not establish that IRBC is necessary. The MUST identify exactly what an IRBC would add beyond the per-prefix policy, existing role and OTC behavior, and the available routing evidence. It MUST also consider whether the same requirement can be met by multiple eBGP sessions, RPA objects, or an extension of an existing interconnection-intent representation.
+
+## Control-Plane and Data-Plane Boundary
+
+An operator may state an expectation that traffic should traverse a preferred provider or path. However, an AS_PATH observed in the BGP control plane does not necessarily establish the actual data-plane forwarding path. Internal routing, tunnels, policy-based forwarding, ECMP, and other mechanisms may affect packet forwarding.
+
+The initial IRBC scope therefore focuses on BGP control-plane behavior, such as route origination, advertisement, propagation, and selected attribute handling. Data-plane commitments are outside the initial scope unless the required data-plane evidence and observation model are separately defined.
+
+# Problem Statement
+
+## From Local Policy to an Attributable External Declaration
+
+An AS can implement routing behavior using local policy, but that configuration does not automatically provide another domain with an interoperable statement of the behavior the AS claims it will perform. Conversely, a published statement does not demonstrate that the AS follows it. A model may be useful to distinguish internal policy, an externally understandable commitment, and evidence of actual behavior. The need for a distinct model MUST be evaluated against existing interconnection-intent structures and IBN assurance functions.
+
+## Issuer, Subject, and Authority
+
+A declaration can be assessed only if the assessor can identify the issuer, the AS or routing domain that is the subject, and the authority under which the declaration was made. The relevant authority may concern operation of the AS, address resources, or control of routing policy. These do not necessarily belong to the same entity. A general model MUST NOT assume that possession of an ASN or a prefix resource automatically proves authority to make every routing-policy commitment for an AS.
+
+## Scope and Behavioral Semantics
+
+A statement such as "do not export this route" is incomplete without identifying the route, neighbor or neighbor class, address family, direction, time interval, and applicable conditions. A commitment may express a mandatory behavior, a prohibition, a permission, or a preference. These meanings are distinguishable. The model MUST also address overlapping scopes, exceptions, and conflicting statements.
+
+## Evidence and External Observability
+
+A commitment does not create the evidence required to assess it. A remote observer may have access to public BGP data, selected route collectors, a limited set of RIBs, BMP feeds, or evidence voluntarily supplied by the issuer. These sources have different coverage and trust properties. BMP defined in {{RFC7854}} provides a protocol for obtaining route views from BGP speakers. Support for Adj-RIB-Out monitoring is specified in {{RFC8671}}. Neither a monitoring feed nor a public collector view SHOULD be assumed to provide complete evidence for every neighbor and every route.
+
+The model MUST relate each behavior claim to the evidence needed to assess it and MUST represent observation points, time intervals, provenance, coverage, and limitations. Evidence that a route was observed at one point does not prove that it was or was not advertised to every other neighbor. A missing observation MUST NOT automatically be interpreted as proof that an event did not occur.
+
+## Unilateral and Bilateral Statements
+
+An AS may make a unilateral declaration about its own behavior. A bilateral interconnection arrangement may require corresponding declarations or an explicit agreement by both parties. A declaration from AS A cannot establish consent or a commitment by AS B. A model MUST preserve the identity and authority of each issuer and provide a way to represent disagreement or inconsistent declarations without silently treating one party's statement as authoritative for the other.
+
+## Assessment and Uncertainty
+
+The available evidence may support compliance, support a violation, or be insufficient to reach either conclusion. A binary result is therefore not always appropriate. An assessment model SHOULD distinguish:
+
+- Compliant: the available evidence supports that the declared behavior was followed within the stated scope and assessment conditions.
+- Violation: the available evidence supports that the declared behavior was not followed within the stated scope and assessment conditions.
+- Indeterminate: the evidence is insufficient, incomplete, conflicting, or inapplicable to reach either conclusion.
+
+These outcomes describe assessment confidence and evidence sufficiency. They do not imply that every routing behavior can be independently verified in all deployments.
+
+## Lifecycle and Information Disclosure
+
+Routing policies and inter-domain relationships change. A declaration may be updated, superseded, withdrawn, or become inapplicable when a connection or route scope changes. An assessor may retain stale or delayed information. A model MUST address validity, versioning, update, withdrawal, revocation, and the relationship between an observation interval and the applicable declaration version.
+
+At the same time, publishing a commitment may reveal sensitive information about topology, customers, peering, or traffic engineering. The model SHOULD identify the minimum information required for a meaningful assessment and the limits imposed by selective disclosure.
+
+# Positioning and Gap
+
+The gap is the absence of a cross-domain, attributable, scope-aware, evidence-relative framework​ for expressing and assessing an AS's own BGP behavior commitments. Specifically:
+
+- No existing mechanism binds a behavior claim to an issuer, subject, and authority​ in a way that an external domain can verify.
+- No existing mechanism scopes a behavior claim to connection, route class, direction, and condition​ with explicit semantics for mandatory, prohibited, permitted, and preferred behaviors.
+- No existing mechanism defines how external evidence maps to a compliance assessment, including the explicit representation of indeterminate outcomes.
+
+# Requirements
+
+## Issuer and Subject Attribution
+
+A model SHOULD identify the issuer, the subject AS or routing domain, and the authority under which the issuer makes the declaration. It SHOULD distinguish self-issued declarations from delegated declarations and SHOULD NOT infer routing-policy authority solely from prefix ownership or ASN registration.
+
+## Self-Commitment and Party Separation
+
+A declaration SHOULD be limited to behavior for which the subject or issuer has responsibility. It MUST NOT imply that another AS has accepted a reciprocal commitment. Where a bilateral arrangement is relevant, each party's declaration and evidence SHOULD remain attributable to that party.
+
+## Routing-Specific Scope
+
+A model SHOULD support scope dimensions relevant to inter-domain routing, which may include:
+
+- subject AS and neighboring AS or inter-domain connection
+- AFI/SAFI
+- prefix, prefix set, origin AS, or route class
+- ingress or egress direction
+- relevant BGP behavior, such as origination, advertisement, propagation, or attribute handling
+- validity interval and operational conditions
+- explicit exceptions and exclusions.
+
+These dimensions are a routing-specific application of the intent scope and network scope concepts in {{RFC9316}}, not a replacement for the general taxonomy.
+
+## Behavior Semantics
+
+A model SHOULD distinguish mandatory behavior, prohibited behavior, permitted behavior, and preferred behavior. It SHOULD define how conditional statements, exceptions, and precedence are interpreted. A preference MUST NOT be treated as a mandatory obligation, and a permission MUST NOT be treated as a requirement to perform an action.
+
+Connection roles may be included as context for a declaration. They SHOULD NOT be equated with the finite BGP Role values defined in {{RFC9234}}, nor SHOULD the model redefine the protocol behavior associated with those values.
+
+## Claim-to-Evidence Relationship
+
+A model SHOULD identify, for each supported behavior claim, the evidence types that may support an assessment and the limits of those evidence types. Evidence metadata SHOULD include provenance, observation point, collection time, coverage, and integrity properties where available. The model SHOULD permit an indeterminate result when the evidence cannot support a reliable conclusion.
+
+## External Assessment
+
+A model SHOULD allow an assessor outside the issuer's administrative domain to interpret the declaration and report an assessment without assuming access to the issuer's complete internal configuration or all routing state. It SHOULD state when issuer cooperation or evidence from internal observation points is necessary.
+
+## Lifecycle and Consistency
+
+A model SHOULD address creation, publication, update, supersession, withdrawal, validity, and revocation. It SHOULD enable an assessor to identify which declaration version applies to a given observation interval and to recognize stale, conflicting, or inconsistent declarations.
+
+## Disclosure and Deployment
+
+A model SHOULD minimize unnecessary disclosure of internal policy and topology while exposing enough information to make the commitment meaningful and assessable. It SHOULD also consider partial deployment, missing declarations, unsupported behavior types, and unavailable evidence. Absence of an IRBC MUST NOT be interpreted as evidence of misbehavior.
+
+# Security Considerations
+
+An externally assessable routing behavior commitment introduces security considerations because declarations may influence how other domains interpret an AS's behavior. This document identifies issues for further and does not specify a complete security architecture.
+
+An attacker may publish a declaration while impersonating an AS operator or may publish a declaration for an AS that the issuer does not control. A future mechanism needs to authenticate the issuer and determine whether the issuer is authorized to make statements for the subject AS and declared scope. Authority over an ASN, address resources, and routing policy may be held by different entities; these forms of authority MUST NOT be conflated.
+
+A declaration may be modified, substituted, replayed, or rolled back to an earlier version. A future model needs to consider integrity protection, version identification, validity intervals, freshness, update, withdrawal, and revocation.
+
+An issuer may provide different declarations to different observers, intentionally or accidentally. A signature on an individual declaration does not by itself prevent equivocation. Further work may need to consider consistency mechanisms, auditability, or transparency services.
+
+An authentic declaration may describe behavior that the issuer does not follow. Authentication establishes the origin of a declaration, not compliance with it. Assessment requires appropriate evidence and MUST account for incomplete observation and the possibility that some behavior is not externally observable.
+
+Evidence may be forged, altered, selectively disclosed, or collected from insufficient observation points. A future framework needs to state the trust placed in routers, collectors, monitoring systems, and evidence providers. It MUST NOT treat an absence of data as proof that an event did not occur.
+
+Large numbers of declarations, overlapping scopes, or complex conditional statements may increase storage, distribution, and assessment costs. A future design SHOULD consider bounded complexity, resource limits, and input validation.
+
+Declarations may reveal topology, peering relationships, customer categories, or traffic-engineering preferences. A future design SHOULD evaluate what information MUST be disclosed to support a meaningful assessment and what information can remain internal.
+
+An assessor may apply a declaration outside its scope or confuse a preference with a mandatory behavior. A declaration by one AS MUST NOT be interpreted as proof that another AS has agreed to a reciprocal behavior. Scope, conditions, exceptions, and issuer responsibility MUST therefore be explicit.
+
+# IANA Considerations
+
+This document has no IANA actions.
+
+--- back
+
+# Scope and Non-Goals
+
+This document focuses on the problem statement and requirements for issuer-attributable, externally assessable routing behavior commitments in inter-domain BGP environments.
+
+The following topics are outside the scope of this document:
+
+- redefining the general concepts, taxonomy, lifecycle, or architecture of IBN
+- defining a general-purpose intent language, schema, ontology, or translation engine
+- defining an IBN controller, multi-domain orchestrator, policy compiler, or closed-loop automation architecture
+- defining a general interconnection-intent model or replacing the work in {{I-D.contreras-nmrg-interconnection-intents}}
+- defining a complete routing-policy language or replacing RPSL or Routing Policy YANG
+- defining an IRBC wire format, serialization, or information model
+- defining a new BGP attribute, community, capability, or AFI/SAFI
+- defining an RPKI signed-object profile, trust-anchor model, or distribution protocol
+- defining a universal verification algorithm or claiming that all routing behavior can be externally verified
+- replacing ROA/ROV, ASPA, ASRA, RPA, BGPsec, FC-BGP, BGP Roles, or OTC
+- defining data-plane forwarding commitments in the absence of a corresponding evidence model.
+
+IBN systems may be used to generate, manage, or assess routing behavior commitments. Existing routing-security mechanisms may provide authorization or evidence relevant to an assessment. Any future protocol or information-model work requires separate analysis and coordination with the appropriate IETF or IRTF groups.
+
+# Relationship to Existing and Mechanisms
+
+This section identifies the capabilities that an IRBC model would reuse and the areas that require further investigation. It does not imply that the referenced work is deficient or that an IRBC MUST be implemented as a new protocol object.
+
+## IBN
+
+IRBC is related to IBN, but it is not a replacement for or a new version of the general IBN model. IRBC and IBN operate at different levels of abstraction and address different questions. IBN is a management paradigm that translates operator goals into network actions and closes the loop through monitoring and assurance. IRBC is a cross-domain declaration and assessment paradigm. IRBC asks how an AS can make an attributable, scoped statement about its own BGP behavior, and how an external domain can evaluate that statement using limited evidence. An IBN system MAY consume or produce IRBCs, but IRBC does not depend on an IBN system for its definition or validity.
+
+{{RFC9315}} describes general IBN concepts and functions, including intent fulfillment, intent translation, orchestration, monitoring, intent compliance assessment, and the intent lifecycle. {{RFC9316}} provides a methodology for classifying intents, including intent users, intent types, intent scope, network scope, abstraction, and lifecycle. This document reuses these foundations and does not define another general intent taxonomy or lifecycle.
+
+An IRBC is a routing-specific declaration associated with an AS's responsibility for its own inter-domain routing behavior. It is more explicit and technically scoped than a high-level service goal. An IBN system may derive an IRBC from an operator's intent and local policy, exchange it with another domain, and use monitoring or evidence services to assess it. Those IBN system functions are outside the definition of an IRBC.
+
+The distinction from general Intent Assurance is also specific. {{RFC9315}} already describes the comparison of observed network behavior with intended behavior. The question here is how such assurance applies when the declaration is attributable to one AS, the assessor belongs to another administrative domain, and the evidence is limited to what can be obtained or trusted across that boundary. This document therefore investigates a routing-specific external-assessment problem; it does not claim to introduce the general concept of assurance.
+
+{{RFC9315}} defines general IBN concepts and functions, including intent fulfillment and intent assurance. In particular, Intent Assurance compares observed network behavior with the behavior expected by an intent. {{RFC9316}} provides dimensions for classifying intents, including user, type, scope, network scope, abstraction, and lifecycle. IRBC SHOULD reuse these foundations. It SHOULD NOT introduce a second general definition of intent, a competing intent taxonomy, a new generic intent-scope model, or a separate generic intent lifecycle. The routing-specific question under consideration is whether a declaration attributable to a particular AS or authorized operator, and intended to be assessed by another administrative domain, requires additional semantics beyond the general IBN concepts.
+
+{{I-D.irtf-nmrg-ibn-usecases}} discusses IBN for routing and path selection, including service-function chaining and SRv6-oriented scenarios. It also includes an IBN-for-Interconnection scenario in which one provider selects an interconnection intent and specifies target resources, another provider maps intent types to protocols or APIs and establishes or provisions the requested resources, and monitoring information is collected and analyzed during the assurance phase. This work already covers routing-related intent, interconnection fulfillment, monitoring-based assurance, and multi-domain intent considerations. IRBC MUST NOT be presented as filling a general absence of these capabilities. Its proposed focus is narrower: a declaration attributable to the subject AS about that AS's own BGP control-plane behavior, together with the evidence semantics relevant to an assessor outside the subject's administrative domain.
+
+{{I-D.contreras-nmrg-interconnection-intents}} considers the use of intents to express advanced interconnection requirements beyond traditional IP peering. It discusses interconnection intent types, an intent lifecycle, protocol aspects, and a declarative intent structure. The structure includes Expectation, Target, Condition, and Context. Its conventional IP peering example includes peer AS identification, peer IP address, peering authentication, and traffic levels. Its fulfillment and assurance procedures describe a provider requesting or specifying resources, a provider mapping intent to protocols or APIs and provisioning resources, monitoring telemetry, internal checks of committed service-level objectives, and reporting or analyzing metrics against the request.
+
+{{I-D.irtf-nmrg-ibn-usecases}} also refers to the interconnection-intent work when describing its interconnection scenario. Accordingly, IRBC MUST NOT claim novelty for cross-domain intent expression, peer identification, intent targets, conditions, context, fulfillment, or monitoring-based service assurance.
+
+The distinction investigated by IRBC is narrower and concerns the object and responsibility of the declaration. An interconnection intent can express a request, expectation, or desired service outcome involving capabilities or resources offered by another provider. An IRBC instead concerns a statement made by an AS about routing behavior for which that AS takes responsibility. The distinction is not absolute: an interconnection intent may include provider-side behavior expectations, and an IBN assurance system may assess those expectations. The question is whether a reusable AS-attributable declaration, specifically scoped to BGP behavior and designed for assessment by an external domain, provides semantics that are not adequately captured by the existing interconnection-intent model and its assurance workflow.
+
+An interconnection intent and an IRBC may be related. An interconnection intent may lead to an operator configuring behavior and issuing one or more IRBCs; an IRBC may provide a declaration that an interconnection-intent assurance process can consume. Conversely, an IRBC may exist without a preceding bilateral interconnection-intent exchange. The two concepts SHOULD NOT be assumed to be separate protocol objects until this relationship has been evaluated through concrete scenarios.
+
+## BGP Policy and Policy Representation
+
+BGP policy controls route import, selection, and export {{RFC4271}}. Operational guidance describes common BGP security and policy practices {{RFC7454}}. RPSL provides a language for describing routing policies {{RFC2622}}; RPSLng extends this approach to IPv6 routing policy {{RFC4012}}; and the Routing Policy YANG Data Model provides a vendor-neutral model for configuring and managing routing policy {{RFC9067}}. BGP Communities {{RFC1997}}, Extended Communities {{RFC4360}}, and Large Communities {{RFC8092}} can carry operator-defined signaling information. {{RFC8212}} defines default eBGP route propagation behavior when import or export policy is absent.
+
+These mechanisms demonstrate that routing policy can be configured, represented, and signaled. IRBC MUST NOT claim that routing policy cannot be expressed or that BGP has no means to carry policy-related information. The question is whether a policy representation or signal, by itself, also identifies an authorized issuer, states an externally understandable commitment for a defined scope, and provides semantics for assessing the commitment using evidence obtained from another domain. These properties depend on the applicable policy model, trust relationships, and evidence mechanisms; they are not automatically provided by the existence of a policy language or community value.
+
+## Routing-Security Mechanisms
+
+RPKI Route Origin Authorizations (ROAs) defined in {{RFC9582}} provide digitally signed authorization for an AS to originate routes to specified prefixes. BGP Prefix Origin Validation defined in {{RFC6811}} defines how a BGP speaker determines the origin-validation state of a route. Operational guidance for applying origin validation on eBGP export is provided by {{RFC8893}}. ASPA provides signed provider-authorization information, and ASPA-based AS_PATH verification is specified in current SIDROPS work {{I-D.ietf-sidrops-aspa-profile}} {{I-D.ietf-sidrops-aspa-verification}}. BGPsec defined in {{RFC8205}} provides cryptographic protection for AS_PATH propagation information in BGP UPDATE messages .
+
+IRBC is not a replacement for ROA/ROV, ASPA, BGPsec, BGP Roles, or OTC. Any proposed routing-behavior semantics MUST be shown to add value beyond the specific authorization and propagation properties already addressed by those mechanisms and MUST coexist with them.
+
+BGP Roles and the Only-to-Customer (OTC) defined in {{RFC9234}} attribute define role negotiation and specific route-leak prevention and detection behavior. The working definition and classification of BGP route leaks are described in {{RFC7908}}. {{RFC9234}} defines a finite set of BGP Roles for eBGP sessions and corresponding route-propagation rules. It also identifies complex peering relationships, for which BGP Roles are not configured on a single eBGP session, and notes that per-prefix policies may be used without in-band measures to check the correctness of the per-prefix peering configuration. These details are relevant to scope-dependent routing behavior, but IRBC MUST NOT redefine BGP Role or OTC semantics.
