@@ -1,7 +1,7 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-01T04:20:53.051750+00:00",
-  "repo": "FCBGP/idr-intent",
+  "timestamp": "2026-11-03T05:19:08.423263+00:00",
+  "repo": "FCBGP/irbc",
   "labels": [
     {
       "name": "accessibility",
@@ -55,5 +55,34 @@
     }
   ],
   "issues": [],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOUQ30bc8AAAABMRdAxg",
+      "title": "publish v00",
+      "url": "https://github.com/FCBGP/irbc/pull/1",
+      "state": "MERGED",
+      "author": "BasilGuo",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-11-02T10:11:50Z",
+      "updatedAt": "2026-11-02T10:12:44Z",
+      "baseRepository": "FCBGP/irbc",
+      "baseRefName": "main",
+      "baseRefOid": "8640c5744a152cd583c4f29a71fe5751834a54e3",
+      "headRepository": "FCBGP/irbc",
+      "headRefName": "v00",
+      "headRefOid": "d96d29aa4318e60ae4b07a6378375172e1c29a38",
+      "closedAt": "2026-11-02T10:12:44Z",
+      "mergedAt": "2026-11-02T10:12:44Z",
+      "mergedBy": "BasilGuo",
+      "mergeCommit": {
+        "oid": "90c36472ba1ebce9cb1f8d0dc59d668ab8009074"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
 }
